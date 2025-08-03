@@ -1,0 +1,552 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Revisión de Electricidad y Protección Catódica</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap');
+
+        :root {
+            --bg-color: #2c3e50;
+            --container-color: #34495e;
+            --text-color: #ecf0f1;
+            --correct-color: #27ae60;
+            --incorrect-color: #c0392b;
+            --primary-accent: #2980b9;
+            --secondary-accent: #8e44ad;
+            --card-shadow: 0 10px 20px rgba(0,0,0,0.19), 0 6px 6px rgba(0,0,0,0.23);
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: linear-gradient(135deg, var(--bg-color), #1e2b38);
+            color: var(--text-color);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            padding: 20px;
+            box-sizing: border-box;
+        }
+
+        .quiz-container {
+            background-color: var(--container-color);
+            border-radius: 15px;
+            padding: 30px;
+            width: 100%;
+            max-width: 800px;
+            box-shadow: var(--card-shadow);
+            text-align: center;
+        }
+
+        .header {
+            margin-bottom: 20px;
+            border-bottom: 2px solid var(--primary-accent);
+            padding-bottom: 15px;
+        }
+
+        .header h1 {
+            margin: 0;
+            color: var(--primary-accent);
+            font-weight: 600;
+            font-size: 2.2em;
+        }
+
+        .stats {
+            display: flex;
+            justify-content: space-between;
+            font-size: 1.2em;
+            font-weight: 600;
+            margin-bottom: 25px;
+        }
+
+        #question-counter {
+            color: var(--secondary-accent);
+        }
+
+        #score {
+            color: var(--correct-color);
+        }
+
+        #question-text {
+            font-size: 1.5em;
+            margin-bottom: 30px;
+            min-height: 80px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .options-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 15px;
+        }
+
+        .option-btn {
+            background-color: var(--primary-accent);
+            color: var(--text-color);
+            border: none;
+            border-radius: 10px;
+            padding: 15px;
+            font-size: 1em;
+            font-family: 'Poppins', sans-serif;
+            cursor: pointer;
+            transition: transform 0.2s ease, background-color 0.2s ease;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 70px; 
+        }
+
+        .option-btn:hover:not(:disabled) {
+            transform: translateY(-5px);
+            background-color: #3498db;
+        }
+        
+        .option-btn:disabled {
+            cursor: not-allowed;
+            opacity: 0.7;
+        }
+
+        .option-btn.correct {
+            background-color: var(--correct-color) !important;
+            animation: pulse 0.5s;
+        }
+
+        .option-btn.incorrect {
+            background-color: var(--incorrect-color) !important;
+            animation: shake 0.5s;
+        }
+
+        #feedback-text {
+            margin-top: 20px;
+            font-size: 1.2em;
+            font-weight: 600;
+            min-height: 30px;
+        }
+
+        #results-screen {
+            display: none;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        #results-screen h2 {
+            color: var(--primary-accent);
+            font-size: 2.5em;
+        }
+
+        #final-score {
+            font-size: 1.8em;
+            margin: 20px 0;
+        }
+        
+        #restart-btn {
+            background-color: var(--secondary-accent);
+            color: var(--text-color);
+            border: none;
+            border-radius: 10px;
+            padding: 15px 30px;
+            font-size: 1.2em;
+            cursor: pointer;
+            transition: transform 0.2s ease, background-color 0.3s ease;
+        }
+
+        #restart-btn:hover {
+            transform: scale(1.05);
+            background-color: #9b59b6;
+        }
+
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-5px); }
+            75% { transform: translateX(5px); }
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+        }
+
+    </style>
+</head>
+<body>
+
+    <div class="quiz-container">
+        <div id="game-screen">
+            <div class="header">
+                <h1>Revisión de Electricidad Básica y Protección Catódica</h1>
+            </div>
+            <div class="stats">
+                <span id="question-counter">Pregunta 1/49</span>
+                <span id="score">Puntaje: 0</span>
+            </div>
+            <p id="question-text">Cargando pregunta...</p>
+            <div class="options-grid" id="options-container">
+                <!-- Opciones se generan aquí -->
+            </div>
+            <p id="feedback-text"></p>
+        </div>
+
+        <div id="results-screen">
+            <h2>¡Juego Terminado!</h2>
+            <p id="final-score">Tu puntaje final es: 0 de 49</p>
+            <p id="result-message">¡Sigue estudiando para ser un experto!</p>
+            <button id="restart-btn">Jugar de Nuevo</button>
+        </div>
+    </div>
+
+    <script>
+        const questions = [
+    {
+        question: "¿Qué son los electrones?",
+        options: ["Partículas que tienen carga negativa.", "Partículas que tienen carga positiva.", "Partículas neutras sin carga.", "Un tipo de onda electromagnética."],
+        answer: 0
+    },
+    {
+        question: "¿Cómo se define el voltaje (o potencial)?",
+        options: ["El flujo de cargas a lo largo de un camino conductor.", "La energía que pone las cargas en movimiento, también conocida como fuerza electromotriz.", "La oposición que las cargas encuentran al moverse a través de un material.", "La energía utilizada por un dispositivo eléctrico."],
+        answer: 1
+    },
+    {
+        question: "¿Cuál es la unidad común para medir la corriente eléctrica?",
+        options: ["Volts.", "Ohms.", "Amperes.", "Watts."],
+        answer: 2
+    },
+    {
+        question: "¿Qué representa la resistencia en un circuito eléctrico?",
+        options: ["El flujo de corriente a través de un material.", "La fuerza que impulsa las cargas.", "La energía consumida por un dispositivo.", "La oposición que las cargas encuentran al moverse a través de un material."],
+        answer: 3
+    },
+    {
+        question: "En el trabajo de corrosión y protección catódica, ¿cuáles de las siguientes unidades de voltaje se utilizan?",
+        options: ["Volts, milivolts y microvolts.", "Kilovolts y megavolts solamente.", "Amperes y miliamperes.", "Ohms y kilohms."],
+        answer: 0
+    },
+    {
+        question: "¿Cuántos milivoltios (mV) equivalen a 0.100 Volts?",
+        options: ["10 mV.", "100 mV.", "1 mV.", "1000 mV."],
+        answer: 1
+    },
+    {
+        question: "¿Cuál es el símbolo griego utilizado para la resistividad?",
+        options: ["Ω (Omega).", "I (Iota).", "ρ (Rho).", "E (Épsilon)."],
+        answer: 2
+    },
+    {
+        question: "Según la Ley de Ohm, si el voltaje (E) y la resistencia (R) son conocidos, ¿cómo se calcula la corriente (I)?",
+        options: ["I = E * R.", "I = R / E.", "I = (E + R) / 2.", "I = E / R."],
+        answer: 3
+    },
+    {
+        question: "¿Qué describe mejor la corriente directa (DC)?",
+        options: ["Cambia de dirección cíclicamente, comúnmente 100 o 120 veces por segundo.", "Fluye constantemente en una sola dirección en un circuito.", "Es la corriente que se encuentra en los hogares y edificios.", "Se mide en hertz (Hz)."],
+        answer: 1
+    },
+    {
+        question: "¿Qué tipo de corriente produce una batería \"pura\"?",
+        options: ["Corriente alterna (AC).", "Corriente pulsante.", "Corriente directa (DC).", "Corriente rectificada."],
+        answer: 2
+    },
+    {
+        question: "¿Cuál es la función principal de un rectificador en el contexto de la protección catódica?",
+        options: ["Aumentar el voltaje de la corriente alterna.", "Disminuir el voltaje de la corriente directa.", "Convertir corriente directa en corriente alterna.", "Convertir corriente alterna en corriente directa."],
+        answer: 3
+    },
+    {
+        question: "¿Cómo se expresa la potencia (P) si se conoce el voltaje (E) y la corriente (I)?",
+        options: ["P = E * I.", "P = E / I.", "P = I / E.", "P = E + I."],
+        answer: 0
+    },
+    {
+        question: "Según la Ley de Voltaje de Kirchhoff, ¿qué es igual a la suma de los voltajes de fuente alrededor de cualquier bucle cerrado de un circuito?",
+        options: ["La suma de las corrientes que fluyen en el bucle.", "La suma de las caídas de voltaje a través de las resistencias en ese bucle.", "Cero, si no hay fuentes.", "La resistencia total del bucle."],
+        answer: 1
+    },
+    {
+        question: "En un circuito en serie, ¿qué característica es la misma a través de cada componente?",
+        options: ["El voltaje total.", "La resistencia total.", "La corriente.", "La potencia."],
+        answer: 2
+    },
+    {
+        question: "Si tienes un circuito en paralelo, ¿qué es cierto sobre la caída de voltaje a través de cada elemento o fuente en el circuito?",
+        options: ["Puede ser diferente en cada rama.", "Se divide proporcionalmente entre las ramas.", "Siempre es la misma.", "Es igual a la suma de las corrientes en cada rama."],
+        answer: 2
+    },
+    {
+        question: "¿Qué tipo de circuito representan los ánodos galvánicos unidos a una estructura?",
+        options: ["Un circuito en serie.", "Un circuito mixto.", "Un circuito en paralelo.", "Un circuito de puente."],
+        answer: 2
+    },
+    {
+        question: "La impedancia es la oposición total que un circuito presenta a la corriente alterna. ¿De qué depende la impedancia además de ser similar a la resistencia en DC?",
+        options: ["Solo de la magnitud del voltaje.", "De la frecuencia y la forma de onda de la corriente.", "De la temperatura ambiente.", "Del tipo de material conductor únicamente."],
+        answer: 1
+    },
+    {
+        question: "¿Cuántos amperios (A) equivalen a 1000 miliamperios (mA)?",
+        options: ["0.001 A.", "0.1 A.", "1.000 A.", "10.000 A."],
+        answer: 2
+    },
+    {
+        question: "En la fórmula de la Ley de Ohm, E = IR, si E se mide en Volts e I en Amperes, ¿en qué unidad debe medirse R?",
+        options: ["Watts.", "Joules.", "Siemens.", "Ohms (Ω)."],
+        answer: 3
+    },
+    {
+        question: "Ejercicio de Cálculo (Fácil): Si un circuito tiene un voltaje de 1.0 V y una resistencia de 1000 Ω, ¿cuál es la corriente (I) en el circuito?",
+        options: ["0.001 A (o 1 mA).", "1.0 A.", "1000 A.", "10.0 A."],
+        answer: 0
+    },
+    {
+        question: "Ejercicio de Cálculo (Fácil): Si la corriente en un circuito es de 1 mA y el voltaje es de 1.0 V, ¿cuál es la resistencia (R)?",
+        options: ["1 Ω.", "1000 Ω.", "0.001 Ω.", "100 Ω."],
+        answer: 1
+    },
+    {
+        question: "Ejercicio de Cálculo (Medio): Una batería de protección catódica entrega 12 V de voltaje a un circuito con una resistencia de 6 Ω. ¿Cuál es la corriente que fluye por el circuito?",
+        options: ["0.5 A.", "1.5 A.", "2 A.", "72 A."],
+        answer: 2
+    },
+    {
+        question: "Ejercicio de Cálculo (Medio): Si un dispositivo eléctrico consume 5 Amperes de corriente y tiene una resistencia de 10 Ohms, ¿cuál es la potencia consumida por el dispositivo? (P = I²R)",
+        options: ["50 Watts.", "100 Watts.", "250 Watts.", "500 Watts."],
+        answer: 2
+    },
+    {
+        question: "Ejercicio de Cálculo (Medio): En un circuito donde la potencia (P) es de 120 Watts y la corriente (I) es de 10 Amperes, ¿cuál es el voltaje (E)? (P = EI)",
+        options: ["12 Volts.", "1200 Volts.", "120 Volts.", "1.2 Volts."],
+        answer: 0
+    },
+    {
+        question: "Ejercicio de Cálculo (Medio): Un circuito en serie tiene tres resistencias: R1 = 5 Ω, R2 = 3 Ω y R3 = 2 Ω. ¿Cuál es la resistencia total (RT) del circuito?",
+        options: ["8 Ω.", "10 Ω.", "15 Ω.", "30 Ω."],
+        answer: 1
+    },
+    {
+        question: "Si el circuito del ejemplo anterior (R1=5Ω, R2=3Ω, R3=2Ω) está conectado a una fuente de voltaje total (ET) de 10 V, ¿cuál es la corriente total (IT) que fluye a través del circuito en serie?",
+        options: ["0.5 A.", "0.1 A.", "1 A.", "2 A."],
+        answer: 2
+    },
+    {
+        question: "Considerando el mismo circuito en serie (R1=5Ω, R2=3Ω, R3=2Ω y IT=1A), ¿cuál es la caída de voltaje a través de la resistencia R1?",
+        options: ["2 V.", "3 V.", "5 V.", "10 V."],
+        answer: 2
+    },
+    {
+        question: "En la Ley de Corriente de Kirchhoff, ¿qué es cierto sobre la corriente en un punto de unión?",
+        options: ["La suma de la corriente que entra es igual a la suma de la corriente que sale.", "La suma de la corriente es siempre cero.", "La corriente se duplica en cada bifurcación.", "La corriente que sale es siempre mayor que la que entra."],
+        answer: 0
+    },
+    {
+        question: "Si en un punto de unión la corriente entrante es de 6 A y las corrientes salientes son 3 A y 2 A, ¿cuál sería la tercera corriente saliente según la Ley de Corriente de Kirchhoff?",
+        options: ["0 A.", "1 A.", "6 A.", "11 A."],
+        answer: 1
+    },
+    {
+        question: "¿Qué característica tiene la corriente alterna (AC)?",
+        options: ["Fluye constantemente en una dirección.", "Es producida únicamente por baterías.", "Invierte regularmente la dirección del flujo.", "Se mantiene constante en voltaje."],
+        answer: 2
+    },
+    {
+        question: "Si un transformador tiene 100 espiras en el primario y 50 espiras en el secundario, y se aplica 120 V al primario, ¿cuál será el voltaje en el secundario bajo condiciones sin carga?",
+        options: ["240 V.", "120 V.", "60 V.", "2400 V."],
+        answer: 2
+    },
+    {
+        question: "¿Cuál es el propósito de las \"tomas\" (taps) ubicadas en el bobinado secundario de los transformadores en los rectificadores de protección catódica?",
+        options: ["Reducir las pérdidas de energía.", "Permitir ajustes de voltaje.", "Aumentar la corriente de salida.", "Convertir AC a DC."],
+        answer: 1
+    },
+    {
+        question: "¿Qué es el \"ripple\" en la corriente directa (DC) producida por la rectificación de AC?",
+        options: ["Una forma de onda cuadrada.", "Pequeñas variaciones o fluctuaciones que impiden que sea una DC pura.", "Un aumento constante del voltaje.", "La inversión cíclica de la corriente."],
+        answer: 1
+    },
+    {
+        question: "La resistividad (ρ) de un material se calcula con la fórmula ρ = (R * A) / L. Si R está en Ω, A en cm² y L en cm, ¿qué unidad tendrá la resistividad?",
+        options: ["Ω/cm.", "Ω·cm.", "Ω·cm².", "Ω·cm/m."],
+        answer: 1
+    },
+    {
+        question: "En un circuito en paralelo, si todas las resistencias son iguales, ¿cómo se puede calcular la resistencia total?",
+        options: ["Multiplicando la resistencia de un resistor por el número de resistores.", "Dividiendo la resistencia de un resistor por el número de resistores.", "Sumando la resistencia de todos los resistores.", "Elevando al cuadrado la resistencia de un resistor."],
+        answer: 1
+    },
+    {
+        question: "Ejercicio de Cálculo (Difícil): Un circuito paralelo tiene R1=5Ω, R2=4Ω, R3=2Ω. Si el voltaje es 20V, ¿cuál es la corriente (I1) en R1?",
+        options: ["4 A.", "5 A.", "10 A.", "19 A."],
+        answer: 0
+    },
+    {
+        question: "Utilizando los valores del ejercicio anterior (E=20V, R1=5Ω, R2=4Ω, R3=2Ω), ¿cuál es la corriente total (IT) que fluye en el circuito paralelo?",
+        options: ["4 A.", "19 A.", "9 A.", "10 A."],
+        answer: 1
+    },
+    {
+        question: "Utilizando los valores del ejercicio anterior (R1=5Ω, R2=4Ω, R3=2Ω), ¿cuál es la resistencia total (RT) del circuito paralelo?",
+        options: ["0.2 Ω.", "0.5 Ω.", "1.05 Ω.", "11 Ω."],
+        answer: 2
+    },
+    {
+        question: "¿Cuál de los siguientes no es un símbolo común para el voltaje?",
+        options: ["emf.", "E.", "V.", "I."],
+        answer: 3
+    },
+    {
+        question: "¿Cuál de las siguientes afirmaciones sobre la impedancia es correcta?",
+        options: ["Es siempre igual a la resistencia en DC.", "Se mide en Ohms, al igual que la resistencia DC.", "Es solo relevante para circuitos de corriente directa.", "No depende de la frecuencia del corriente."],
+        answer: 1
+    },
+    {
+        question: "¿Qué se establece en el núcleo de un transformador a partir del voltaje aplicado al bobinado primario?",
+        options: ["Un campo eléctrico estático.", "Un campo magnético alterno.", "Un flujo de electrones constante.", "Una resistencia variable."],
+        answer: 1
+    },
+    {
+        question: "¿Qué tipo de fenómenos son la corrosión y la protección catódica?",
+        options: ["Fenómenos puramente mecánicos.", "Fenómenos puramente térmicos.", "Fenómenos electroquímicos.", "Fenómenos puramente químicos."],
+        answer: 2
+    },
+    {
+        question: "¿Qué es un kilovolt (kV)?",
+        options: ["0.001 Volts.", "100 Volts.", "1 Volt.", "1,000 Volts."],
+        answer: 3
+    },
+    {
+        question: "¿Cuál es la definición de \"Ampere\" según la fuente?",
+        options: ["Un flujo de carga de 1 Volt por segundo.", "La unidad de carga de 6.24 x 10^18 electrones.", "El flujo de carga de 1 Coulomb por segundo.", "La resistencia encontrada por 1 Coulomb de carga."],
+        answer: 2
+    },
+    {
+        question: "¿Cómo se vería una corriente directa pura en un osciloscopio?",
+        options: ["Como una onda sinusoidal.", "Como una línea recta.", "Como una serie de picos y valles.", "Como una onda cuadrada."],
+        answer: 1
+    },
+    {
+        question: "¿Qué nombre se le da a un ciclo de corriente alterna (AC)?",
+        options: ["Ohm.", "Hertz (Hz).", "Amper.", "Volt."],
+        answer: 1
+    },
+    {
+        question: "En un circuito básico de DC (Figura 2), ¿hacia dónde apunta la flecha que indica la dirección de la corriente convencional?",
+        options: ["Del terminal negativo al positivo de la fuente de voltaje.", "Del terminal positivo al negativo de la fuente de voltaje.", "Hacia el centro del circuito.", "Aleatoriamente, dependiendo de la carga."],
+        answer: 1
+    },
+    {
+        question: "Ejercicio de Cálculo (Difícil): Un circuito serie-paralelo tiene una parte paralela con R1=5Ω, R2=4Ω, R3=2Ω. ¿Cuál es la resistencia equivalente de esta sección?",
+        options: ["1.05 Ω.", "0.95 Ω.", "11 Ω.", "2.00 Ω."],
+        answer: 0
+    },
+    {
+        question: "Continuando, si la resistencia equivalente paralela es 1.05 Ω y hay una resistencia en serie R4 = 0.95 Ω, ¿cuál es la resistencia total del circuito?",
+        options: ["1.05 Ω.", "2.00 Ω.", "0.95 Ω.", "11 Ω."],
+        answer: 1
+    }
+];
+
+        const gameScreen = document.getElementById('game-screen');
+        const resultsScreen = document.getElementById('results-screen');
+        const questionCounterEl = document.getElementById('question-counter');
+        const scoreEl = document.getElementById('score');
+        const questionTextEl = document.getElementById('question-text');
+        const optionsContainer = document.getElementById('options-container');
+        const feedbackTextEl = document.getElementById('feedback-text');
+        const finalScoreEl = document.getElementById('final-score');
+        const resultMessageEl = document.getElementById('result-message');
+        const restartBtn = document.getElementById('restart-btn');
+
+        let currentQuestionIndex = 0;
+        let score = 0;
+        let shuffledQuestions = [];
+
+        function startGame() {
+            currentQuestionIndex = 0;
+            score = 0;
+            shuffledQuestions = questions.sort(() => Math.random() - 0.5);
+            gameScreen.style.display = 'block';
+            resultsScreen.style.display = 'none';
+            updateStats();
+            showQuestion();
+        }
+
+        function updateStats() {
+            questionCounterEl.textContent = `Pregunta ${currentQuestionIndex + 1}/${questions.length}`;
+            scoreEl.textContent = `Puntaje: ${score}`;
+        }
+
+        function showQuestion() {
+            feedbackTextEl.textContent = '';
+            const currentQuestion = shuffledQuestions[currentQuestionIndex];
+            questionTextEl.textContent = currentQuestion.question;
+            optionsContainer.innerHTML = '';
+
+            currentQuestion.options.forEach((option, index) => {
+                const button = document.createElement('button');
+                button.textContent = option;
+                button.classList.add('option-btn');
+                button.addEventListener('click', () => selectAnswer(index));
+                optionsContainer.appendChild(button);
+            });
+        }
+
+        function selectAnswer(selectedIndex) {
+            const currentQuestion = shuffledQuestions[currentQuestionIndex];
+            const buttons = optionsContainer.querySelectorAll('.option-btn');
+            
+            buttons.forEach(btn => btn.disabled = true);
+
+            if (selectedIndex === currentQuestion.answer) {
+                score++;
+                buttons[selectedIndex].classList.add('correct');
+                feedbackTextEl.textContent = "¡Correcto! ¡Muy bien!";
+                feedbackTextEl.style.color = 'var(--correct-color)';
+            } else {
+                buttons[selectedIndex].classList.add('incorrect');
+                buttons[currentQuestion.answer].classList.add('correct');
+                feedbackTextEl.textContent = "¡Incorrecto! La respuesta correcta está en verde.";
+                feedbackTextEl.style.color = 'var(--incorrect-color)';
+            }
+
+            updateStats();
+
+            setTimeout(() => {
+                currentQuestionIndex++;
+                if (currentQuestionIndex < questions.length) {
+                    showQuestion();
+                } else {
+                    showResults();
+                }
+            }, 2000);
+        }
+
+        function showResults() {
+            gameScreen.style.display = 'none';
+            resultsScreen.style.display = 'flex';
+            finalScoreEl.textContent = `Tu puntaje final es: ${score} de ${questions.length}`;
+
+            let message = '';
+            const percentage = (score / questions.length) * 100;
+            if (percentage >= 90) {
+                message = "¡Felicidades! ¡Eres un experto en la materia!";
+            } else if (percentage >= 70) {
+                message = "¡Excelente trabajo! Tienes un conocimiento muy sólido.";
+            } else if (percentage >= 50) {
+                message = "¡Buen esfuerzo! Sigue repasando para afianzar conceptos.";
+            } else {
+                message = "No te rindas. ¡La práctica hace al maestro!";
+            }
+            resultMessageEl.textContent = message;
+        }
+
+        restartBtn.addEventListener('click', startGame);
+
+        // Iniciar el juego al cargar la página
+        startGame();
+    </script>
+</body>
+</html>
