@@ -45,6 +45,9 @@
             margin-bottom: 20px;
             border-bottom: 2px solid var(--primary-accent);
             padding-bottom: 15px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
         }
 
         .header h1 {
@@ -52,6 +55,26 @@
             color: var(--primary-accent);
             font-weight: 600;
             font-size: 2.2em;
+            flex-grow: 1; /* Permite que el título ocupe el espacio disponible */
+            text-align: center; /* Centra el título */
+        }
+
+        .menu-button {
+            background-color: var(--secondary-accent);
+            color: var(--text-color);
+            border: none;
+            border-radius: 10px;
+            padding: 10px 20px;
+            font-size: 1em;
+            cursor: pointer;
+            transition: transform 0.2s ease, background-color 0.3s ease;
+            text-decoration: none; /* Para que se vea como un botón */
+            white-space: nowrap; /* Evita que el texto se rompa */
+        }
+
+        .menu-button:hover {
+            transform: scale(1.05);
+            background-color: #9b59b6;
         }
 
         .stats {
@@ -179,6 +202,7 @@
     <div class="quiz-container">
         <div id="game-screen">
             <div class="header">
+                <a href="index.html" class="menu-button">Volver al Menú</a>
                 <h1>Revisión de Electricidad Básica y Protección Catódica</h1>
             </div>
             <div class="stats">
