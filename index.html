@@ -3,30 +3,152 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Ejemplo de Canvas</title>
+    <title>Entrenamiento Certificación NACE CP2 - Menú Principal</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
     <style>
         body {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
-            margin: 0;
-            background-color: #f0f0f0;
+            font-family: 'Poppins', sans-serif;
+            background-color: #1a202c; /* Color de fondo oscuro */
+            color: #e2e8f0; /* Color de texto claro */
         }
-        canvas {
-            border: 1px solid #000;
+        .main-container {
+            background: linear-gradient(145deg, #2d3748, #1a202c);
+            box-shadow: 0 10px 20px rgba(0,0,0,0.3), 0 6px 6px rgba(0,0,0,0.25);
+            border-radius: 20px;
+        }
+        .menu-item {
+            background-color: #2d3748;
+            border-left: 5px solid #4299e1;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.2);
+        }
+        .menu-item:hover {
+            transform: translateX(5px);
+            box-shadow: 0 8px 12px rgba(0,0,0,0.3);
+            border-left-color: #38b2ac;
+        }
+        .menu-item a {
+            display: flex;
+            align-items: center;
+            padding: 1rem 1.5rem;
+            text-decoration: none;
+            color: #e2e8f0;
+            width: 100%;
+        }
+        .item-number {
+            color: #4299e1;
+            font-weight: 700;
+            font-size: 1.25rem;
+            margin-right: 1.5rem;
+            min-width: 2.5rem; /* Alineación de texto */
+        }
+        .item-text {
+            font-weight: 600;
+            font-size: 1.1rem;
         }
     </style>
 </head>
-<body>
-    <canvas id="miCanvas" width="500" height="300"></canvas>
-    <script>
-        const canvas = document.getElementById('miCanvas');
-        const ctx = canvas.getContext('2d');
+<body class="flex items-center justify-center min-h-screen p-4">
 
-        // Dibujar un rectángulo rojo para demostración
-        ctx.fillStyle = 'red';
-        ctx.fillRect(10, 10, 150, 100);
-    </script>
+    <div class="main-container w-full max-w-4xl mx-auto p-6 md:p-10">
+        <div class="text-center mb-10">
+            <img src="petroenergy.jpg" alt="Logo Petroenergy" class="mx-auto mb-6 h-20" onerror="this.onerror=null;this.src='https://placehold.co/200x80/1a202c/e2e8f0?text=PetroEnergy';">
+            <h1 class="text-3xl md:text-4xl font-bold text-cyan-400">Práctica para Certificación NACE CP2</h1>
+            <p class="text-gray-400 mt-2">Selecciona un tema para comenzar tu entrenamiento.</p>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <!-- Columna 1 -->
+            <div class="space-y-6">
+                <div class="menu-item rounded-lg">
+                    <a href="entrena_01.html">
+                        <span class="item-number">01</span>
+                        <span class="item-text">Teoría de la Corrosión</span>
+                    </a>
+                </div>
+                 <div class="menu-item rounded-lg">
+                    <a href="entrena_02.html">
+                        <span class="item-number">02</span>
+                        <span class="item-text">Fundamentos de PC</span>
+                    </a>
+                </div>
+                <div class="menu-item rounded-lg">
+                    <a href="entrena_03.html">
+                        <span class="item-number">03</span>
+                        <span class="item-text">Sistemas de PC</span>
+                    </a>
+                </div>
+                 <div class="menu-item rounded-lg">
+                    <a href="entrena_04.html">
+                        <span class="item-number">04</span>
+                        <span class="item-text">Fuentes DC para PC</span>
+                    </a>
+                </div>
+                <div class="menu-item rounded-lg">
+                    <a href="entrena_05.html">
+                        <span class="item-number">05</span>
+                        <span class="item-text">Seguridad</span>
+                    </a>
+                </div>
+            
+                <div class="menu-item rounded-lg">
+                    <a href="entrena_06.html">
+                        <span class="item-number">06</span>
+                        <span class="item-text">Mediciones de campo</span>
+                    </a>
+                </div>
+                <div class="menu-item rounded-lg">
+                    <a href="entrena_07.html">
+                        <span class="item-number">07</span>
+                        <span class="item-text">Corrientes Vagabundas e Interferencias PC</span>
+                    </a>
+                </div>
+                </div>
+
+            <!-- Columna 2 -->
+            <div class="space-y-6">
+                <div class="menu-item rounded-lg">
+                    <a href="entrena_08.html">
+                        <span class="item-number">08</span>
+                        <span class="item-text">Monitoreo y Registros</span>
+                    </a>
+                </div>
+                <div class="menu-item rounded-lg">
+                    <a href="entrena_a01.html">
+                        <span class="item-number">A1</span>
+                        <span class="item-text">Revisión Electricidad Básica</span>
+                    </a>
+                </div>
+                <div class="menu-item rounded-lg">
+                    <a href="entrena_a02.html">
+                        <span class="item-number">A2</span>
+                        <span class="item-text">Teoría de Química y Corrosión (Básica)</span>
+                    </a>
+                </div>
+                <div class="menu-item rounded-lg">
+                    <a href="entrena_a03.html">
+                        <span class="item-number">A3</span>
+                        <span class="item-text">Operación de los medidores</span>
+                    </a>
+                </div>
+                 <div class="menu-item rounded-lg">
+                    <a href="entrena_e01.html">
+                        <span class="item-number">E1</span>
+                        <span class="item-text">Ejercicios Teoría de la Corrosión</span>
+                    </a>
+                </div>
+                <div class="menu-item rounded-lg">
+                    <a href="entrena_e02.html">
+                        <span class="item-number">E2</span>
+                        <span class="item-text">Ejercicios Sistemas de PC</span>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
 </body>
 </html>
